@@ -24,14 +24,24 @@ def vrp_problem_definition(df: pd.DataFrame, api_key: str, depots_path: str, bas
         shifts = []
         config = CONFIG.get(client_name, CONFIG["default"])
 
+        # Determine if start/end location should be included based on config
+        start_location_depot = config["fleet"]["dedicatedVehicles"]["shifts"].get("start_location_depot", True)
+        end_location_depot = config["fleet"]["dedicatedVehicles"]["shifts"].get("end_location_depot", False)
+
+        start_shift = {"time": f"{base_date_str}T{start_time}Z"}
+        end_shift = {"time": f"{base_date_str}T{end_time}Z"}
+
+        if start_location_depot:
+            start_shift["location"] = {"lat": lat, "lng": lng}
+        if end_location_depot:
+            end_shift["location"] = {"lat": lat, "lng": lng}
+
         shifts.append({
-            "start": {"time": f"{base_date_str}T{start_time}Z", "location": {"lat": lat, "lng": lng}}, # definiton of start time and location
-            #"start": {"time": f"{base_date_str}T{start_time}Z"}, # definiton of start time without location
-            "end": {"time": f"{base_date_str}T{end_time}Z"}, # definition of end time without location
-            #"end": {"time": f"{base_date_str}T{end_time}Z", "location": {"lat": lat, "lng": lng}}, # definition of end time and location
+            "start": start_shift,
+            "end": end_shift,
             "breaks": [{
-                "duration": config["break_duration"][shift_type],
-                "times": [[f"{base_date_str}T{config['break_times'][shift_type][0]}Z", f"{base_date_str}T{config['break_times'][shift_type][1]}Z"]]
+            "duration": config["break_duration"][shift_type],
+            "times": [[f"{base_date_str}T{config['break_times'][shift_type][0]}Z", f"{base_date_str}T{config['break_times'][shift_type][1]}Z"]]
             }]
         })
         return shifts
