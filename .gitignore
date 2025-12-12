@@ -1,0 +1,17 @@
+# Python-Cache-Dateien
+__pycache__/
+venv/
+.vscode/
+*.pyc
+
+# Temporäre Dateien
+*.tmp
+*.log
+
+# Jupyter Notebook Checkpoints
+.ipynb_checkpoints/
+TourPlanning_Script.ipynb
+
+# Systemdateien
+.DS_Store
+Thumbs.db

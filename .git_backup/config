@@ -1,0 +1,51 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+	ignorecase = true
+	precomposeunicode = true
+[remote "origin"]
+	url = https://github.com/OliverBrenningmeyer/tourplanning_modules.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "main"]
+	remote = origin
+	merge = refs/heads/main
+[pull]
+	rebase = true
+[branch "OliverBrenningmeyer/issue1"]
+	github-pr-base-branch = "OliverBrenningmeyer#tourplanning_modules#main"
+	vscode-merge-base = origin/main
+	vscode-merge-base = origin/main
+	remote = origin
+	merge = refs/heads/OliverBrenningmeyer/issue1
+[branch "OliverBrenningmeyer/issue8"]
+	github-pr-base-branch = "OliverBrenningmeyer#tourplanning_modules#main"
+	vscode-merge-base = origin/main
+	vscode-merge-base = origin/main
+	remote = origin
+	merge = refs/heads/OliverBrenningmeyer/issue8
+	github-pr-owner-number = "OliverBrenningmeyer#tourplanning_modules#9"
+	github-pr-owner-number = "OliverBrenningmeyer#tourplanning_modules#9"
+	github-pr-owner-number = "OliverBrenningmeyer#tourplanning_modules#9"
+	github-pr-owner-number = "OliverBrenningmeyer#tourplanning_modules#9"
+	github-pr-owner-number = "OliverBrenningmeyer#tourplanning_modules#9"
+	github-pr-owner-number = "OliverBrenningmeyer#tourplanning_modules#9"
+[branch "OliverBrenningmeyer/issue11"]
+	github-pr-base-branch = "OliverBrenningmeyer#tourplanning_modules#main"
+	vscode-merge-base = origin/main
+	vscode-merge-base = origin/main
+	remote = origin
+	merge = refs/heads/OliverBrenningmeyer/issue11
+	github-pr-owner-number = "OliverBrenningmeyer#tourplanning_modules#14"
+[branch "OliverBrenningmeyer/issue10"]
+	github-pr-base-branch = "OliverBrenningmeyer#tourplanning_modules#main"
+	vscode-merge-base = origin/main
+	vscode-merge-base = origin/main
+[branch "OliverBrenningmeyer/issue4"]
+	github-pr-base-branch = "OliverBrenningmeyer#tourplanning_modules#main"
+	vscode-merge-base = origin/main
+	vscode-merge-base = origin/main
+	remote = origin
+	merge = refs/heads/OliverBrenningmeyer/issue4
+	github-pr-owner-number = "OliverBrenningmeyer#tourplanning_modules#16"

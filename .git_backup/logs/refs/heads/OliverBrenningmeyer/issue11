@@ -1,0 +1,2 @@
+0000000000000000000000000000000000000000 f63685e4aa64211ffddcc29ce5a2d7e8c989f0fb OliverBrenningmeyer <oliver.brenningmeyer@bexapp.de> 1746040941 +0200	branch: Created from HEAD
+f63685e4aa64211ffddcc29ce5a2d7e8c989f0fb 4df4a0acdf38d93f5c4c6254362a83878c52b58c OliverBrenningmeyer <oliver.brenningmeyer@bexapp.de> 1746042768 +0200	commit: Bug: Company Name for pickup is not part of the csv export + empty customer_named need to be n/a

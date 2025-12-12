@@ -1,0 +1,4 @@
+0000000000000000000000000000000000000000 4fd88bedbec8dbf8fbccbf62766460aab2e7bcfd OliverBrenningmeyer <oliver.brenningmeyer@bexapp.de> 1746001978 +0200	branch: Created from HEAD
+4fd88bedbec8dbf8fbccbf62766460aab2e7bcfd 5564c752406e2273e4215edf9875f5b2b1fef845 OliverBrenningmeyer <oliver.brenningmeyer@bexapp.de> 1746003028 +0200	commit: Refactor tour planning scripts to include product category in VRP definition and adjust column mappings
+5564c752406e2273e4215edf9875f5b2b1fef845 14e3bde8d274cb490c94d84f5b8f27836c9aa0bc OliverBrenningmeyer <oliver.brenningmeyer@bexapp.de> 1746003285 +0200	commit: Refactor fleet type generation to compute vehicle prefixes based on product category
+14e3bde8d274cb490c94d84f5b8f27836c9aa0bc f48ad1c742287a02ecc62b2633f894528dd0547c OliverBrenningmeyer <oliver.brenningmeyer@bexapp.de> 1746003482 +0200	commit: Allow setting of product_category

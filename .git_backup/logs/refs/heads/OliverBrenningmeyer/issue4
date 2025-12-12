@@ -1,0 +1,3 @@
+0000000000000000000000000000000000000000 d8d81f1ff6445b5f11bb9670166918e564df424c OliverBrenningmeyer <oliver.brenningmeyer@bexapp.de> 1746261555 +0200	branch: Created from HEAD
+d8d81f1ff6445b5f11bb9670166918e564df424c 4a532cecedb2822a8d2574302395a90a43ef758d OliverBrenningmeyer <oliver.brenningmeyer@bexapp.de> 1746261558 +0200	commit: Adjust Kemmler Configuration based on latest file structure
+4a532cecedb2822a8d2574302395a90a43ef758d b9b7f0cb91264029d54c7972ed397b9001b687b4 OliverBrenningmeyer <oliver.brenningmeyer@bexapp.de> 1746261703 +0200	commit (merge): Merge branch 'main' into OliverBrenningmeyer/issue4
