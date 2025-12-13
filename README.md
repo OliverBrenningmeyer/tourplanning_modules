@@ -407,5 +407,6 @@ Both require API keys stored in Google Colab secrets or environment variables.
 
 ## Contact
 
-[Add contact information here]
+Oliver Brenningmeyer
+oliver.brenningmeyer@bexapp.de
 
