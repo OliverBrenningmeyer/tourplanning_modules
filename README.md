@@ -17,6 +17,15 @@ This system automates the entire workflow from raw order data to optimized vehic
 - **Advanced Optimization**: Multiple optimization objectives (minimize cost, tours, unassigned jobs; balance duration; maximize territory jobs)
 - **Interactive Visualization**: Generates interactive maps showing optimized routes
 
+## Running Locally vs. Google Colab
+
+This system can run both **locally** on your machine and in **Google Colab**. 
+
+- **Google Colab**: Best for quick runs, sharing, and when you need the interactive file upload widget
+- **Local**: Best for faster execution, offline work, better debugging, and production use
+
+See [LOCAL_SETUP.md](LOCAL_SETUP.md) for detailed local setup instructions, or use the provided `run_tour_planning.py` script.
+
 ## Quick Start (Google Colab)
 
 ### Prerequisites
