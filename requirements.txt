@@ -5,3 +5,4 @@ networkx
 matplotlib
 requests
 folium
+python-dotenv

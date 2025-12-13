@@ -7,12 +7,17 @@ This version uses your synced Google Drive files without copying them.
 import os
 import sys
 from pathlib import Path
-# Optional: Load environment variables from .env file
+# Load environment variables from .env file
 try:
     from dotenv import load_dotenv
-    load_dotenv()
+    # Load .env file from the same directory as this script
+    env_path = Path(__file__).parent / '.env'
+    load_dotenv(dotenv_path=env_path)
 except ImportError:
-    pass  # python-dotenv is optional
+    print("Warning: python-dotenv not installed. Install with: pip install python-dotenv")
+    print("Or set HERE_API_KEY as environment variable")
+except Exception as e:
+    print(f"Warning: Could not load .env file: {e}")
 
 # Add current directory to path for module imports
 sys.path.insert(0, str(Path(__file__).parent))
@@ -69,7 +74,7 @@ def main():
     if client_name == "Stark":
         depots_path = google_drive_base / "stark" / "depots" / "Depots_geocoded.xlsx"
         output_folder_path = google_drive_base / "stark" / base_date_str
-        input_file = google_drive_base / "stark" / "Kemmler - Auftragsspeicher - Touren.xlsx"  # Adjust filename
+        input_file = google_drive_base / "stark" / "orders.xlsx"  # Adjust filename
         sheet_name = 'Sheet1'
     elif client_name == "Kemmler":
         depots_path = google_drive_base / "kemmler" / "depots" / "Depots_geocoded.xlsx"
@@ -84,7 +89,7 @@ def main():
     elif client_name == "Wigger":
         depots_path = google_drive_base / "Wigger" / "depots" / "Depots_geocoded.xlsx"
         output_folder_path = google_drive_base / "Wigger" / base_date_str
-        input_file = google_drive_base / "Wigger" / "orders.xlsx"  # Adjust filename
+        input_file = google_drive_base / "Wigger" / "Wigger - Auftragsspeicher - Touren.xlsx"  # Adjust filename
         sheet_name = 'Touren - BEX'
     elif client_name == "Obi_Buchholz":
         depots_path = google_drive_base / "Obi_Buchholz" / "depots" / "Depots_geocoded.xlsx"

@@ -1,0 +1,36 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run Tour Planning (Google Drive)",
+      "type": "shell",
+      "command": "python3 run_tour_planning_gdrive.py",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "options": {
+        "env": {
+          "HERE_API_KEY": "${env:HERE_API_KEY}"
+        }
+      }
+    },
+    {
+      "label": "Run Tour Planning (Local Data)",
+      "type": "shell",
+      "command": "python3 run_tour_planning.py",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "options": {
+        "env": {
+          "HERE_API_KEY": "${env:HERE_API_KEY}"
+        }
+      }
+    }
+  ]
+}
+
