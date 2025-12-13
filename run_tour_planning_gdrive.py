@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 """
-Local runner for Tour Planning Script
-Run this script locally without Google Colab dependencies.
+Local runner for Tour Planning Script - Using Google Drive paths directly
+This version uses your synced Google Drive files without copying them.
 """
 
 import os
 import sys
 from pathlib import Path
 # Optional: Load environment variables from .env file
-# Install with: pip install python-dotenv
 try:
     from dotenv import load_dotenv
     load_dotenv()
@@ -40,10 +39,10 @@ def replace_nan_with_none_recursive(obj):
         return obj
 
 def main():
-    """Main execution function"""
+    """Main execution function - Uses Google Drive paths directly"""
     
     # ============================================================================
-    # CONFIGURATION - Modify these values for your local setup
+    # CONFIGURATION
     # ============================================================================
     
     # Get API key from environment variable
@@ -60,48 +59,42 @@ def main():
     product_category = "Ohne Modifikation"  # Options: Ohne Modifikation, bex Kurier, bex Tour
     
     # ============================================================================
-    # PATH CONFIGURATION - Update these to match your local file structure
+    # GOOGLE DRIVE PATHS - Uses your synced Google Drive directly
     # ============================================================================
     
-    # Base directory for data (adjust to your setup)
-    # Option 1: Use local data directory (default)
-    base_data_dir = Path("./data")
+    # Google Drive base path (adjust if your path is different)
+    google_drive_base = Path("/Users/oliverroscher/Library/CloudStorage/GoogleDrive-oliver.brenningmeyer@bexapp.de/Meine Ablage/Colab Notebooks")
     
-    # Option 2: Use Google Drive paths directly (if synced locally)
-    # Uncomment and adjust if your Google Drive is synced:
-    # google_drive_base = Path("/Users/oliverroscher/Library/CloudStorage/GoogleDrive-oliver.brenningmeyer@bexapp.de/Meine Ablage/Colab Notebooks")
-    # base_data_dir = google_drive_base  # Use this instead of "./data"
-    
-    # Set paths based on client
+    # Set paths based on client (matching Colab structure)
     if client_name == "Stark":
-        depots_path = base_data_dir / "stark" / "depots" / "Depots_geocoded.xlsx"
-        output_folder_path = base_data_dir / "stark" / base_date_str
-        input_file = base_data_dir / "stark" / "orders.xlsx"  # Update with your input file
+        depots_path = google_drive_base / "stark" / "depots" / "Depots_geocoded.xlsx"
+        output_folder_path = google_drive_base / "stark" / base_date_str
+        input_file = google_drive_base / "stark" / "Kemmler - Auftragsspeicher - Touren.xlsx"  # Adjust filename
         sheet_name = 'Sheet1'
     elif client_name == "Kemmler":
-        depots_path = base_data_dir / "kemmler" / "depots" / "Depots_geocoded.xlsx"
-        output_folder_path = base_data_dir / "kemmler" / base_date_str
-        input_file = base_data_dir / "kemmler" / "orders.xlsx"  # Update with your input file
+        depots_path = google_drive_base / "kemmler" / "depots" / "Depots_geocoded.xlsx"
+        output_folder_path = google_drive_base / "kemmler" / base_date_str
+        input_file = google_drive_base / "kemmler" / "Kemmler - Auftragsspeicher - Touren.xlsx"
         sheet_name = 'Touren - BEX'
     elif client_name == "laminatDepot_MultiBranch":
-        depots_path = base_data_dir / "laminatdepot" / "depots" / "Depots_geocoded.xlsx"
-        output_folder_path = base_data_dir / "laminatdepot" / base_date_str
-        input_file = base_data_dir / "laminatdepot" / "orders.xlsx"  # Update with your input file
+        depots_path = google_drive_base / "laminatdepot" / "depots" / "Depots_geocoded.xlsx"
+        output_folder_path = google_drive_base / "laminatdepot" / base_date_str
+        input_file = google_drive_base / "laminatdepot" / "orders.xlsx"  # Adjust filename
         sheet_name = 'input'
     elif client_name == "Wigger":
-        depots_path = base_data_dir / "Wigger" / "depots" / "Depots_geocoded.xlsx"
-        output_folder_path = base_data_dir / "Wigger" / base_date_str
-        input_file = base_data_dir / "Wigger" / "orders.xlsx"  # Update with your input file
+        depots_path = google_drive_base / "Wigger" / "depots" / "Depots_geocoded.xlsx"
+        output_folder_path = google_drive_base / "Wigger" / base_date_str
+        input_file = google_drive_base / "Wigger" / "orders.xlsx"  # Adjust filename
         sheet_name = 'Touren - BEX'
     elif client_name == "Obi_Buchholz":
-        depots_path = base_data_dir / "Obi_Buchholz" / "depots" / "Depots_geocoded.xlsx"
-        output_folder_path = base_data_dir / "Obi_Buchholz" / base_date_str
-        input_file = base_data_dir / "Obi_Buchholz" / "orders.xlsx"  # Update with your input file
+        depots_path = google_drive_base / "Obi_Buchholz" / "depots" / "Depots_geocoded.xlsx"
+        output_folder_path = google_drive_base / "Obi_Buchholz" / base_date_str
+        input_file = google_drive_base / "Obi_Buchholz" / "orders.xlsx"  # Adjust filename
         sheet_name = 'Touren - BEX'
     else:
-        depots_path = base_data_dir / "generic_tourplanning" / "depots" / "Depots_geocoded.xlsx"
-        output_folder_path = base_data_dir / "generic_tourplanning" / base_date_str
-        input_file = base_data_dir / "generic_tourplanning" / "orders.xlsx"  # Update with your input file
+        depots_path = google_drive_base / "generic_tourplanning" / "depots" / "Depots_geocoded.xlsx"
+        output_folder_path = google_drive_base / "generic_tourplanning" / base_date_str
+        input_file = google_drive_base / "generic_tourplanning" / "orders.xlsx"  # Adjust filename
         sheet_name = 'Sheet1'
     
     # Convert Path objects to strings
@@ -110,11 +103,11 @@ def main():
     input_file = str(input_file)
     
     # ============================================================================
-    # EXECUTION PIPELINE
+    # EXECUTION PIPELINE (same as regular script)
     # ============================================================================
     
     print("=" * 70)
-    print("Tour Planning Script - Local Execution")
+    print("Tour Planning Script - Local Execution (Google Drive)")
     print("=" * 70)
     print(f"Client: {client_name}")
     print(f"Date: {base_date_str}")
@@ -202,7 +195,7 @@ def main():
         print("\nPlease check:")
         print("1. Input file path is correct")
         print("2. Depots file exists")
-        print("3. Data directory structure matches configuration")
+        print("3. Google Drive is synced and accessible")
         sys.exit(1)
     except Exception as e:
         print(f"❌ Error: {e}")
