@@ -26,10 +26,22 @@ def generate_tour_summary(vrp_response_json: dict, merged_df: pd.DataFrame, unas
         vehicle_id = tour.get('vehicleId', 'Unknown')
         type_id = tour.get('typeId', 'Unknown')
         
-        # Get tour statistics from VRP response
+        # Get tour statistics from VRP response - this is the authoritative source
         statistics = tour.get('statistics', {})
-        duration = statistics.get('duration', 0)  # in seconds
+        
+        # Extract distance and duration from statistics (always in meters and seconds)
         distance = statistics.get('distance', 0)  # in meters
+        duration = statistics.get('duration', 0)  # in seconds
+        
+        # Extract duration breakdown if available (driving, service, waiting, etc.)
+        duration_breakdown = {}
+        if 'duration' in statistics:
+            # Check if duration is a dict with breakdown
+            if isinstance(statistics.get('duration'), dict):
+                duration_breakdown = statistics.get('duration', {})
+                # Total duration might be in a 'total' field or sum of components
+                duration = duration_breakdown.get('total', sum(duration_breakdown.values()))
+            # Otherwise duration is already the total in seconds
         
         # Get start and end times from first and last stops
         stops = tour.get('stops', [])
@@ -60,34 +72,9 @@ def generate_tour_summary(vrp_response_json: dict, merged_df: pd.DataFrame, unas
         pickups = len(vehicle_activities[vehicle_activities['Activity Type'] == 'pickup'])
         deliveries = len(vehicle_activities[vehicle_activities['Activity Type'] == 'delivery'])
         
-        # If statistics not available, calculate from merged_df
-        if duration == 0 and not vehicle_activities.empty:
-            # Calculate duration from start and end times if available
-            if 'Start Time' in vehicle_activities.columns and 'End Time' in vehicle_activities.columns:
-                try:
-                    # Get first start time and last end time
-                    start_times = pd.to_datetime(vehicle_activities['Start Time'], errors='coerce')
-                    end_times = pd.to_datetime(vehicle_activities['End Time'], errors='coerce')
-                    if not start_times.isna().all() and not end_times.isna().all():
-                        first_start = start_times.min()
-                        last_end = end_times.max()
-                        if pd.notna(first_start) and pd.notna(last_end):
-                            duration = (last_end - first_start).total_seconds()
-                except:
-                    pass
-        
-        # If distance not available, sum from merged_df
-        # Note: Distance from VRP API is typically in meters, but check the actual values
-        if distance == 0 and not vehicle_activities.empty and 'Distance' in vehicle_activities.columns:
-            try:
-                distance_sum = vehicle_activities['Distance'].sum()
-                # If values seem small (< 1000), they might be in km, otherwise assume meters
-                if distance_sum > 0 and distance_sum < 100:
-                    distance = distance_sum * 1000  # Convert km to meters
-                else:
-                    distance = distance_sum  # Already in meters
-            except:
-                pass
+        # Convert distance from meters to km, duration from seconds to hours
+        distance_km = round(distance / 1000, 2) if distance > 0 else 0
+        duration_hours = round(duration / 3600, 2) if duration > 0 else 0
         
         tour_summaries.append({
             'Vehicle ID': vehicle_id,
@@ -96,8 +83,8 @@ def generate_tour_summary(vrp_response_json: dict, merged_df: pd.DataFrame, unas
             'Jobs': unique_jobs,
             'Pickups': pickups,
             'Deliveries': deliveries,
-            'Duration (hours)': round(duration / 3600, 2),
-            'Distance (km)': round(distance / 1000, 2),
+            'Duration (hours)': duration_hours,
+            'Distance (km)': distance_km,
             'Start Time': start_time,
             'End Time': end_time
         })
