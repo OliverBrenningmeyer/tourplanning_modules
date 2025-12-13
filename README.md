@@ -24,7 +24,24 @@ This system can run both **locally** on your machine and in **Google Colab**.
 - **Google Colab**: Best for quick runs, sharing, and when you need the interactive file upload widget
 - **Local**: Best for faster execution, offline work, better debugging, and production use
 
-See [LOCAL_SETUP.md](LOCAL_SETUP.md) for detailed local setup instructions, or use the provided `run_tour_planning.py` script.
+### Quick Start (Local)
+
+For the fastest local setup, see [QUICK_RUN.md](QUICK_RUN.md). For detailed instructions, see [LOCAL_SETUP.md](LOCAL_SETUP.md).
+
+**Quick commands:**
+```bash
+# Set API key
+export HERE_API_KEY='your_api_key_here'
+
+# Run with Google Drive paths (if synced locally)
+python3 run_tour_planning_gdrive.py
+
+# Or run with local data folder
+python3 run_tour_planning.py
+
+# Or use the quick run script
+./run.sh
+```
 
 ## Quick Start (Google Colab)
 
@@ -182,6 +199,47 @@ Centralized configuration for all clients.
 - **Job**: Pickup and delivery durations
 - **Advanced Objectives**: Optimization priorities
 
+### 10. `module_input_validation.py`
+Validates input files and data quality before processing.
+
+**Features:**
+- Validates Excel file structure and required columns
+- Checks data quality (missing values, date formats, numeric values)
+- Validates depot files
+- Provides detailed error messages and warnings
+- Validates geocoding results
+
+**Functions:**
+- `validate_input_file()`: Validates uploaded Excel file
+- `InputValidator`: Class for comprehensive validation with detailed error reporting
+
+### 11. `module_status_tracker.py`
+Tracks the status of the tour planning process with progress indicators and error reporting.
+
+**Features:**
+- Tracks each processing step with status (success/error/warning)
+- Records errors and warnings with details
+- Provides process summary with duration
+- Can export status to DataFrame
+
+**Functions:**
+- `StatusTracker`: Class for tracking process status
+- `get_tracker()`: Get global status tracker instance
+- `reset_tracker()`: Reset tracker for re-runs
+
+### 12. `module_tour_summary.py`
+Generates and displays tour planning statistics and summaries.
+
+**Features:**
+- Creates summary statistics for each tour (distance, duration, stops, jobs)
+- Displays formatted tour summaries
+- Shows unassigned jobs with reasons
+- Calculates totals across all tours
+
+**Functions:**
+- `generate_tour_summary()`: Creates DataFrame with tour statistics
+- `display_tour_summary()`: Displays formatted summary
+
 ## Requirements
 
 ### For Google Colab
@@ -208,6 +266,7 @@ pip install -r requirements.txt
 - `matplotlib`: Plotting
 - `requests`: API calls
 - `folium`: Map visualization
+- `python-dotenv`: Environment variable management (for local execution)
 
 ## Repository Structure
 
@@ -217,7 +276,14 @@ tourplanning_modules/
 ├── requirements.txt                   # Python dependencies
 ├── .gitignore                         # Git ignore rules
 ├── __init__.py                        # Package initialization
-├── TourPlanning_Script.ipynb         # Main execution notebook
+├── TourPlanning_Script.ipynb         # Main execution notebook (Colab)
+├── run_tour_planning.py               # Local execution script (uses data/ folder)
+├── run_tour_planning_gdrive.py        # Local execution script (uses Google Drive paths)
+├── run.sh                             # Quick run bash script
+├── setup_local.sh                     # Local setup helper script
+├── LOCAL_SETUP.md                     # Detailed local setup guide
+├── QUICK_RUN.md                       # Quick run guide
+├── QUICK_START_SUMMARY.md             # Quick start summary
 ├── module_upload.py                   # File upload module
 ├── module_clean.py                    # Data cleaning module
 ├── module_column_mapping.py           # Column mapping module
@@ -226,10 +292,55 @@ tourplanning_modules/
 ├── module_results.py                  # Results processing module
 ├── module_export.py                   # Export module
 ├── module_map.py                      # Map visualization module
-└── module_client_configuration.py     # Client configuration module
+├── module_client_configuration.py     # Client configuration module
+├── module_input_validation.py         # Input validation module
+├── module_status_tracker.py           # Status tracking module
+├── module_tour_summary.py             # Tour summary module
+└── data/                              # Local data directory (for local execution)
+    ├── {client_name}/
+    │   ├── depots/
+    │   │   └── Depots_geocoded.xlsx
+    │   └── {date}/                    # Output folder (auto-created)
 ```
 
 ## Usage
+
+### Basic Workflow (Local Execution)
+
+**Option 1: Using Google Drive paths (if synced locally)**
+```bash
+# Set API key
+export HERE_API_KEY='your_api_key_here'
+
+# Run the script
+python3 run_tour_planning_gdrive.py
+```
+
+**Option 2: Using local data folder**
+```bash
+# Set API key
+export HERE_API_KEY='your_api_key_here'
+
+# Copy your data files to data/{client_name}/ first
+# Then run:
+python3 run_tour_planning.py
+```
+
+**Option 3: Using quick run script**
+```bash
+# Set API key first
+export HERE_API_KEY='your_api_key_here'
+
+# Run
+./run.sh
+```
+
+**Configuration:**
+- Edit `run_tour_planning.py` or `run_tour_planning_gdrive.py` to change:
+  - `client_name`: Client name (Kemmler, Stark, Wigger, etc.)
+  - `base_date_str`: Planning date (YYYY-MM-DD format)
+  - `product_category`: Product category
+  - File paths (if needed)
 
 ### Basic Workflow (Google Colab)
 
@@ -259,6 +370,13 @@ tourplanning_modules/
    ```python
    # Upload Excel file
    df_raw = module_upload.upload_excel_via_widget(sheet_name='Sheet1')
+   
+   # Validate input (optional but recommended)
+   from module_input_validation import validate_input_file
+   is_valid, errors, warnings = validate_input_file(df_raw, client_name, sheet_name)
+   if not is_valid:
+       print("Validation errors:", errors)
+       # Handle errors...
    
    # Clean data
    df_clean = module_clean.clean_and_process_data(
@@ -304,6 +422,10 @@ tourplanning_modules/
    # Create map
    map = module_map.create_map(merged_df, df_geocoded, unassigned, base_date_str)
    map.save(f'{output_folder_path}/{base_date_str}_tours_map.html')
+   
+   # Display tour summary (optional)
+   from module_tour_summary import display_tour_summary
+   display_tour_summary(vrp_response, merged_df, unassigned, base_date_str)
    ```
 
 ## Configuration
@@ -386,6 +508,23 @@ The system generates several output files:
 2. **`{date}_import_to_bexOS.csv`**: Formatted export for bexOS import
 3. **`{date}_tours_map.html`**: Interactive map visualization
 
+## Local Execution Scripts
+
+The repository includes several scripts for local execution:
+
+### `run_tour_planning.py`
+Main local execution script that uses a local `data/` folder structure. Configure client name, date, and paths in the script.
+
+### `run_tour_planning_gdrive.py`
+Local execution script that uses Google Drive paths directly (if Google Drive is synced locally). This is convenient if you want to use the same files as Colab without copying them.
+
+### `run.sh`
+Quick bash script that checks for API key and runs `run_tour_planning_gdrive.py`. Make it executable with `chmod +x run.sh`.
+
+### Setup Scripts
+- `setup_local.sh`: Helper script for initial local setup
+- See [LOCAL_SETUP.md](LOCAL_SETUP.md) for detailed setup instructions
+
 ## API Requirements
 
 - **HERE Geocoding API**: For address geocoding
@@ -403,12 +542,21 @@ Both require API keys stored in Google Colab secrets or environment variables.
 
 ## Notes
 
-- The system is designed for use in Google Colab but can be adapted for local use
+- The system works in both **Google Colab** and **locally** - see [LOCAL_SETUP.md](LOCAL_SETUP.md) for local setup
 - All dates should be in `YYYY-MM-DD` format
 - Time windows are converted to ISO 8601 format for API compatibility
 - Volume units are standardized (multiplied by 10) for internal processing
 - The system handles rate limiting and retries for HERE API calls
 - Unassigned jobs are tracked with reasons for analysis
+- Input validation is available via `module_input_validation` to catch errors early
+- Status tracking via `module_status_tracker` provides detailed process monitoring
+- Tour summaries via `module_tour_summary` provide quick statistics overview
+
+## Additional Documentation
+
+- **[LOCAL_SETUP.md](LOCAL_SETUP.md)**: Detailed guide for local setup and execution
+- **[QUICK_RUN.md](QUICK_RUN.md)**: Quick reference for running locally
+- **[QUICK_START_SUMMARY.md](QUICK_START_SUMMARY.md)**: Quick start checklist
 
 ## License
 
