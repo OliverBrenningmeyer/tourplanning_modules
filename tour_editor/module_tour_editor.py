@@ -6,7 +6,12 @@ import pandas as pd
 import json
 from typing import Dict, List, Optional
 from IPython.display import display, HTML, clear_output
-import ipywidgets as widgets
+try:
+    import ipywidgets as widgets
+    WIDGETS_AVAILABLE = True
+except ImportError:
+    WIDGETS_AVAILABLE = False
+    widgets = None
 from datetime import datetime, timedelta
 
 
