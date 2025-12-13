@@ -171,22 +171,5 @@ def display_tour_summary(vrp_response_json: dict, merged_df: pd.DataFrame, unass
             print(f"  ... and {len(unassigned_jobs) - 10} more")
     print("=" * 80)
     
-    # Return summary for Colab display if needed
-    if display_in_colab:
-        try:
-            from IPython.display import display
-            display(summary_df.style.set_table_styles([
-                {'selector': 'th', 'props': [('background-color', '#4472C4'), 
-                                           ('color', 'white'),
-                                           ('font-weight', 'bold'),
-                                           ('text-align', 'center')]},
-                {'selector': 'td', 'props': [('text-align', 'center')]},
-                {'selector': 'tr:last-child', 'props': [('background-color', '#D9E1F2'),
-                                                       ('font-weight', 'bold')]}
-            ]))
-        except ImportError:
-            # Not in Colab, just print
-            pass
-    
     return summary_df
 
