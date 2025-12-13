@@ -27,21 +27,17 @@ def generate_tour_summary(vrp_response_json: dict, merged_df: pd.DataFrame, unas
         type_id = tour.get('typeId', 'Unknown')
         
         # Get tour statistics from VRP response - this is the authoritative source
-        statistics = tour.get('statistics', {})
+        # Note: The key is 'statistic' (singular), not 'statistics'
+        statistic = tour.get('statistic', {})
         
-        # Extract distance and duration from statistics (always in meters and seconds)
-        distance = statistics.get('distance', 0)  # in meters
-        duration = statistics.get('duration', 0)  # in seconds
+        # Extract distance and duration from statistic (always in meters and seconds)
+        distance = statistic.get('distance', 0)  # in meters
+        duration = statistic.get('duration', 0)  # in seconds (total duration)
         
-        # Extract duration breakdown if available (driving, service, waiting, etc.)
-        duration_breakdown = {}
-        if 'duration' in statistics:
-            # Check if duration is a dict with breakdown
-            if isinstance(statistics.get('duration'), dict):
-                duration_breakdown = statistics.get('duration', {})
-                # Total duration might be in a 'total' field or sum of components
-                duration = duration_breakdown.get('total', sum(duration_breakdown.values()))
-            # Otherwise duration is already the total in seconds
+        # Extract duration breakdown from 'times' if available
+        # The 'times' dict contains: driving, serving, waiting, stopping, break
+        times_breakdown = statistic.get('times', {})
+        # Note: duration is already the total, times is just the breakdown
         
         # Get start and end times from first and last stops
         stops = tour.get('stops', [])
