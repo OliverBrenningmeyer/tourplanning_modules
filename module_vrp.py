@@ -26,7 +26,7 @@ def vrp_problem_definition(df: pd.DataFrame, api_key: str, depots_path: str, bas
 
         # Determine if start/end location should be included based on config
         start_location_depot = config["fleet"]["dedicatedVehicles"]["shifts"].get("start_location_depot", True)
-        end_location_depot = config["fleet"]["dedicatedVehicles"]["shifts"].get("end_location_depot", False)
+        end_location_depot = config["fleet"]["dedicatedVehicles"]["shifts"].get("end_location_depot", True)
 
         start_shift = {"time": f"{base_date_str}T{start_time}Z"}
         end_shift = {"time": f"{base_date_str}T{end_time}Z"}
