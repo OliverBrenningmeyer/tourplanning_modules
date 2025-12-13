@@ -128,7 +128,12 @@ def clean_and_process_data(df: pd.DataFrame, base_date_str: str, output_folder_p
     # and return the modified DataFrame
     def replace_null_with_extreme_values(df, column_min, column_max):
         if column_min not in df.columns or column_max not in df.columns:
-            raise KeyError(f"Required columns '{column_min}' or '{column_max}' are missing.")
+            raise KeyError(
+                f"❌ Required columns '{column_min}' or '{column_max}' are missing.\n"
+                f"   → This usually means the wrong file or sheet was uploaded\n"
+                f"   → Check that your input file contains the expected columns\n"
+                f"   → Verify the column mapping for client '{client_name}' is correct"
+            )
         min_value = df[column_min].min()
         max_value = df[column_max].max()
         df.loc[:, column_min] = df[column_min].fillna(min_value)
@@ -146,18 +151,25 @@ def clean_and_process_data(df: pd.DataFrame, base_date_str: str, output_folder_p
     def convert_to_iso(df, timewindows: bool):
         # Ensure 'Entl. bis (Auftr.)' is converted to datetime before using .dt accessor
         df['Entl. bis (Auftr.)'] = pd.to_datetime(df['Entl. bis (Auftr.)'], errors='coerce')
+        
+        # Check for parsing errors
+        invalid_dates = df['Entl. bis (Auftr.)'].isnull().sum()
+        if invalid_dates > 0:
+            print(f"⚠️  Warning: {invalid_dates} rows have invalid date format in 'Entl. bis (Auftr.)'")
+            print("   → Expected format: 'dd.mm.yy HH:MM' (e.g., '15.12.25 14:30')")
+            print("   → These rows will be filtered out during date filtering")
 
         # Now safely use the .dt accessor and set times if 00:00 to 23:59 for the end of the timewindow
         df.loc[df['Entl. bis (Auftr.)'].dt.time == datetime.strptime('00:00', '%H:%M').time(), 'Termin bis ISO'] = \
             df['Entl. bis (Auftr.)'].dt.strftime('%Y-%m-%dT18:00:00Z')
         
         if timewindows:
-            df.loc[:, 'Entl. von  (Auftr.)'] = pd.to_datetime(df['Entl. von  (Auftr.)'], format='%d.%m.%y %H:%M')
-            df.loc[:, 'Entl. bis (Auftr.)'] = pd.to_datetime(df['Entl. bis (Auftr.)'], format='%d.%m.%y %H:%M')
+            df.loc[:, 'Entl. von  (Auftr.)'] = pd.to_datetime(df['Entl. von  (Auftr.)'], format='%d.%m.%y %H:%M', errors='coerce')
+            df.loc[:, 'Entl. bis (Auftr.)'] = pd.to_datetime(df['Entl. bis (Auftr.)'], format='%d.%m.%y %H:%M', errors='coerce')
             df.loc[:, 'Termin von ISO'] = df['Entl. von  (Auftr.)'].dt.strftime('%Y-%m-%dT%H:%M:%SZ')
             df.loc[:, 'Termin bis ISO'] = df['Entl. bis (Auftr.)'].dt.strftime('%Y-%m-%dT%H:%M:%SZ')
         else:
-            df.loc[:, 'Entl. bis (Auftr.)'] = pd.to_datetime(df['Entl. bis (Auftr.)'], format='%d.%m.%y %H:%M')
+            df.loc[:, 'Entl. bis (Auftr.)'] = pd.to_datetime(df['Entl. bis (Auftr.)'], format='%d.%m.%y %H:%M', errors='coerce')
             df.loc[:, 'Termin bis ISO'] = df['Entl. bis (Auftr.)'].dt.strftime('%Y-%m-%dT18:00:00Z')
 
         df.loc[:, 'day'] = df['Entl. bis (Auftr.)'].dt.date
@@ -171,7 +183,17 @@ def clean_and_process_data(df: pd.DataFrame, base_date_str: str, output_folder_p
     # to include only rows where 'day' matches base_date
     def filter_by_date(df, base_date_str):
         base_date = datetime.strptime(base_date_str, "%Y-%m-%d").date()
-        return df[df['day'] == base_date]
+        filtered_df = df[df['day'] == base_date]
+        
+        if len(filtered_df) == 0 and len(df) > 0:
+            # Show available dates for debugging
+            available_dates = df['day'].dropna().unique()
+            if len(available_dates) > 0:
+                print(f"⚠️  Warning: No orders found for date {base_date_str}")
+                print(f"   → Available dates in file: {sorted([str(d) for d in available_dates])[:10]}")
+                print(f"   → Check that the planning date matches dates in your input file")
+        
+        return filtered_df
 
     # Function to modify zero or missing weight values
     # Assuming 'customer_shipment_weight_kg' is the column to be modified

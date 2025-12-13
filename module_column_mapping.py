@@ -5,7 +5,7 @@ EXPECTED_COLUMNS = [
     "customer_branch_cluster",
     "Entl. von  (Auftr.)",
     "Entl. bis (Auftr.)",
-    "customer_Lieferschein"
+    "customer_Lieferschein",
     "Auftr.-Nr.",
     "Entladeart",
     "customer_shipment_weight_kg",
@@ -13,7 +13,7 @@ EXPECTED_COLUMNS = [
     "Fahrerhinweis (Auftr.)",
     "Anm. Lieferzeit",
     "Vers.-Str.",
-    "Vers.-Str.-Nr."
+    "Vers.-Str.-Nr.",
     "Vers.-PLZ",
     "Vers.-Name",
     "Vers.-Ort",
