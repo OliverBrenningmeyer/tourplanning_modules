@@ -7,3 +7,4 @@ from . import module_map
 from . import module_column_mapping
 from . import module_export
 from . import module_client_configuration
+from . import module_tour_summary
