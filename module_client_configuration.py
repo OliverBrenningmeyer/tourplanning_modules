@@ -116,7 +116,7 @@ CONFIG = {
                     "time": {"fullDay": 0.014, "halfDay": 0.020}
                 },
                 "shifts": {
-                    "start_location_depot": True, # vehicles start at the depot as defined in the depot file
+                    "start_location_depot": False, # vehicles start at the depot as defined in the depot file
                     "end_location_depot": False # vehicles ends at the depot as defined in the depot file
                 },
                 "limits": {
@@ -172,10 +172,13 @@ CONFIG = {
                 {"type": "minimizeUnassigned"}
             ],
             [
+                {"type": "minimizeCost"}
+            ],
+            [
                 {"type": "minimizeTours"}
             ],
             [
-                {"type": "minimizeCost"}
+                {"type": "maximizeTerritoryJobs"}
             ],
             [
                 {"type": "balanceDuration",
@@ -183,9 +186,6 @@ CONFIG = {
                         "threshold": 0.4 #0...1 (higher value is more liked to be enforced in comparison to the other objectives)
                     }
                 }
-            ],
-            [
-                {"type": "maximizeTerritoryJobs"}
             ]
         ]
     },
