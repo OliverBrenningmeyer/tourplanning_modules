@@ -134,8 +134,18 @@ def clean_and_process_data(df: pd.DataFrame, base_date_str: str, output_folder_p
                 f"   → Check that your input file contains the expected columns\n"
                 f"   → Verify the column mapping for client '{client_name}' is correct"
             )
-        min_value = df[column_min].min()
-        max_value = df[column_max].max()
+        # Get non-null values for min/max calculation
+        min_value = df[column_min].dropna().min()
+        max_value = df[column_max].dropna().max()
+        
+        # If all values are null, we can't determine min/max - this is an error condition
+        if pd.isna(min_value) or pd.isna(max_value):
+            raise ValueError(
+                f"❌ All values in '{column_min}' or '{column_max}' are null.\n"
+                f"   → Cannot determine extreme values for filling nulls\n"
+                f"   → Check that your input file contains valid date/time data"
+            )
+        
         df.loc[:, column_min] = df[column_min].fillna(min_value)
         df.loc[:, column_max] = df[column_max].fillna(max_value)
         return df
@@ -159,20 +169,30 @@ def clean_and_process_data(df: pd.DataFrame, base_date_str: str, output_folder_p
             print("   → Expected format: 'dd.mm.yy HH:MM' (e.g., '15.12.25 14:30')")
             print("   → These rows will be filtered out during date filtering")
 
-        # Now safely use the .dt accessor and set times if 00:00 to 23:59 for the end of the timewindow
-        df.loc[df['Entl. bis (Auftr.)'].dt.time == datetime.strptime('00:00', '%H:%M').time(), 'Termin bis ISO'] = \
-            df['Entl. bis (Auftr.)'].dt.strftime('%Y-%m-%dT18:00:00Z')
+        # Now safely use the .dt accessor and set times if 00:00 to 18:00 for the end of the timewindow
+        # Only process rows where datetime conversion was successful (not NaT)
+        valid_datetime_mask = df['Entl. bis (Auftr.)'].notna()
+        if valid_datetime_mask.any():
+            zero_time_mask = valid_datetime_mask & (df['Entl. bis (Auftr.)'].dt.time == datetime.strptime('00:00', '%H:%M').time())
+            if zero_time_mask.any():
+                df.loc[zero_time_mask, 'Termin bis ISO'] = df.loc[zero_time_mask, 'Entl. bis (Auftr.)'].dt.strftime('%Y-%m-%dT18:00:00Z')
         
         if timewindows:
             df.loc[:, 'Entl. von  (Auftr.)'] = pd.to_datetime(df['Entl. von  (Auftr.)'], format='%d.%m.%y %H:%M', errors='coerce')
             df.loc[:, 'Entl. bis (Auftr.)'] = pd.to_datetime(df['Entl. bis (Auftr.)'], format='%d.%m.%y %H:%M', errors='coerce')
-            df.loc[:, 'Termin von ISO'] = df['Entl. von  (Auftr.)'].dt.strftime('%Y-%m-%dT%H:%M:%SZ')
-            df.loc[:, 'Termin bis ISO'] = df['Entl. bis (Auftr.)'].dt.strftime('%Y-%m-%dT%H:%M:%SZ')
+            # Only create ISO strings for valid datetimes (not NaT)
+            valid_von_mask = df['Entl. von  (Auftr.)'].notna()
+            valid_bis_mask = df['Entl. bis (Auftr.)'].notna()
+            df.loc[valid_von_mask, 'Termin von ISO'] = df.loc[valid_von_mask, 'Entl. von  (Auftr.)'].dt.strftime('%Y-%m-%dT%H:%M:%SZ')
+            df.loc[valid_bis_mask, 'Termin bis ISO'] = df.loc[valid_bis_mask, 'Entl. bis (Auftr.)'].dt.strftime('%Y-%m-%dT%H:%M:%SZ')
         else:
             df.loc[:, 'Entl. bis (Auftr.)'] = pd.to_datetime(df['Entl. bis (Auftr.)'], format='%d.%m.%y %H:%M', errors='coerce')
-            df.loc[:, 'Termin bis ISO'] = df['Entl. bis (Auftr.)'].dt.strftime('%Y-%m-%dT18:00:00Z')
+            # Only create ISO strings for valid datetimes (not NaT)
+            valid_bis_mask = df['Entl. bis (Auftr.)'].notna()
+            df.loc[valid_bis_mask, 'Termin bis ISO'] = df.loc[valid_bis_mask, 'Entl. bis (Auftr.)'].dt.strftime('%Y-%m-%dT18:00:00Z')
 
-        df.loc[:, 'day'] = df['Entl. bis (Auftr.)'].dt.date
+        # Only extract date for valid datetimes
+        df.loc[:, 'day'] = df['Entl. bis (Auftr.)'].apply(lambda x: x.date() if pd.notna(x) else None)
         return df
 
     # Function to filter DataFrame by date
@@ -222,8 +242,10 @@ def clean_and_process_data(df: pd.DataFrame, base_date_str: str, output_folder_p
         if volume_unit_size is not None and volume_unit_size > 0:
             df['customer_shipment_volume_units'] = pd.to_numeric(df['customer_shipment_volume_units'], errors='coerce').fillna(0)
             df['customer_shipment_volume_units'] = df['customer_shipment_volume_units'].apply(
-                lambda x: int(math.ceil(x / volume_unit_size)) if x > 0 else 0
+                lambda x: int(math.ceil(x / volume_unit_size)) if pd.notna(x) and x > 0 else 0
             )
+        # Ensure all values are numeric before multiplying by 10
+        df['customer_shipment_volume_units'] = pd.to_numeric(df['customer_shipment_volume_units'], errors='coerce').fillna(0)
         df.loc[:, 'customer_shipment_volume_units'] = (df['customer_shipment_volume_units'] * 10).astype(int)
 
         return df
@@ -236,11 +258,21 @@ def clean_and_process_data(df: pd.DataFrame, base_date_str: str, output_folder_p
     
     # Function to extract first word from 'customer_branch_cluster' and save it back
     def extract_first_word_and_save(df):
-        df.loc[:, 'customer_branch_cluster'] = df['customer_branch_cluster'].apply(lambda x: x.split()[0] if isinstance(x, str) else x)
+        def extract_first_word(x):
+            if pd.isna(x) or x is None:
+                return x
+            if isinstance(x, str) and x.strip():
+                return x.split()[0]
+            return x
+        df.loc[:, 'customer_branch_cluster'] = df['customer_branch_cluster'].apply(extract_first_word)
 
     # Function to replace umlauts in 'customer_branch_cluster'
     def replace_umlauts_in_column(df):
-        df.loc[:, 'customer_branch_cluster'] = df['customer_branch_cluster'].apply(replace_umlauts)
+        def safe_replace_umlauts(x):
+            if pd.isna(x) or x is None or not isinstance(x, str):
+                return x
+            return replace_umlauts(x)
+        df.loc[:, 'customer_branch_cluster'] = df['customer_branch_cluster'].apply(safe_replace_umlauts)
 
     # Function to create a new folder to store the results in the defined path
     def create_new_folder(base_date_str,output_folder_path):
