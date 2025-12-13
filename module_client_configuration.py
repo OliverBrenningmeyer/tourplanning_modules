@@ -30,7 +30,7 @@ CONFIG = {
                 },
                 "limits": {
                     "maxDistance": {"fullDay": 350000, "halfDay": 250000}, #in meters, this equals 350 km and 250 km
-                    "shiftTime": {"fullDay": 30600, "halfDay": 18000} #in seconds, this equals 8.5 hours and 5 hours
+                    "shiftTime": {"fullDay": 32400, "halfDay": 18000} #in seconds, this equals 9 hours and 5 hours
                 }
             },
             "openVehicles": {
@@ -121,7 +121,7 @@ CONFIG = {
                 },
                 "limits": {
                     "maxDistance": {"fullDay": 350000, "halfDay": 250000}, #in meters, this equals 350 km and 250 km
-                    "shiftTime": {"fullDay": 36000, "halfDay": 18000} #in seconds, this equals 9 hours and 5 hours
+                    "shiftTime": {"fullDay": 32400, "halfDay": 18000} #in seconds, this equals 9 hours and 5 hours
                 }
             },
             "openVehicles": {
@@ -219,7 +219,7 @@ CONFIG = {
                 },
                 "limits": {
                     "maxDistance": {"fullDay": 350000, "halfDay": 250000}, #in meters, this equals 350 km and 250 km
-                    "shiftTime": {"fullDay": 30600, "halfDay": 18000} #in seconds, this equals 8.5 hours and 5 hours
+                    "shiftTime": {"fullDay": 32400, "halfDay": 18000} #in seconds, this equals 9 hours and 5 hours
                 }
             },
             "openVehicles": {
@@ -348,7 +348,7 @@ CONFIG = {
                 },
                 "limits": {
                     "maxDistance": {"fullDay": 350000, "halfDay": 250000}, #in meters, this equals 350 km and 250 km
-                    "shiftTime": {"fullDay": 36000, "halfDay": 18000} #in seconds, this equals 9 hours and 5 hours
+                    "shiftTime": {"fullDay": 32400, "halfDay": 18000} #in seconds, this equals 9 hours and 5 hours
                 }
             },
             "openVehicles": {
@@ -424,12 +424,12 @@ CONFIG = {
                     "time": {"fullDay": 0.014, "halfDay": 0.020}
                 },
                 "shifts": {
-                    "start_location_depot": True, # vehicles start at the depot as defined in the depot file
-                    "end_location_depot": True # vehicles ends at the depot as defined in the depot file
+                    "start_location_depot": False, # vehicles start at the depot as defined in the depot file
+                    "end_location_depot": False # vehicles ends at the depot as defined in the depot file
                 },
                 "limits": {
                     "maxDistance": {"fullDay": 2500000, "halfDay": 1500000}, #in meters, this equals 350 km and 250 km
-                    "shiftTime": {"fullDay": 86400, "halfDay": 86400} #in seconds, this equals 9 hours and 5 hours
+                    "shiftTime": {"fullDay": 32400, "halfDay": 18000} #in seconds, this equals 9 hours and 5 hours
                 },
                 "skills": ["SPRINTER","SPRINTER_TAIL_LIFT","LKW_7_5""DEFAULT_SKILL"]
             },
@@ -501,7 +501,7 @@ CONFIG = {
                 },
                 "limits": {
                     "maxDistance": {"fullDay": 250000, "halfDay": 150000}, #in meters, this equals 350 km and 250 km
-                    "shiftTime": {"fullDay": 36000, "halfDay": 18000} #in seconds, this equals 9 hours and 5 hours
+                    "shiftTime": {"fullDay": 32400, "halfDay": 18000} #in seconds, this equals 9 hours and 5 hours
                 }
             },
             "openVehicles": {
