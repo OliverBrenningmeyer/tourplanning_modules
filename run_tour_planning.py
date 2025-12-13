@@ -75,32 +75,32 @@ def main():
     # Set paths based on client
     if client_name == "Stark":
         depots_path = base_data_dir / "stark" / "depots" / "Depots_geocoded.xlsx"
-        output_folder_path = base_data_dir / "stark" / base_date_str
+        output_folder_path = base_data_dir / "stark" / "outputs" / base_date_str
         input_file = base_data_dir / "stark" / "orders.xlsx"  # Update with your input file
         sheet_name = 'Sheet1'
     elif client_name == "Kemmler":
         depots_path = base_data_dir / "kemmler" / "depots" / "Depots_geocoded.xlsx"
-        output_folder_path = base_data_dir / "kemmler" / base_date_str
+        output_folder_path = base_data_dir / "kemmler" / "outputs" / base_date_str
         input_file = base_data_dir / "kemmler" / "orders.xlsx"  # Update with your input file
         sheet_name = 'Touren - BEX'
     elif client_name == "laminatDepot_MultiBranch":
         depots_path = base_data_dir / "laminatdepot" / "depots" / "Depots_geocoded.xlsx"
-        output_folder_path = base_data_dir / "laminatdepot" / base_date_str
+        output_folder_path = base_data_dir / "laminatdepot" / "outputs" / base_date_str
         input_file = base_data_dir / "laminatdepot" / "orders.xlsx"  # Update with your input file
         sheet_name = 'input'
     elif client_name == "Wigger":
         depots_path = base_data_dir / "Wigger" / "depots" / "Depots_geocoded.xlsx"
-        output_folder_path = base_data_dir / "Wigger" / base_date_str
+        output_folder_path = base_data_dir / "Wigger" / "outputs" / base_date_str
         input_file = base_data_dir / "Wigger" / "orders.xlsx"  # Update with your input file
         sheet_name = 'Touren - BEX'
     elif client_name == "Obi_Buchholz":
         depots_path = base_data_dir / "Obi_Buchholz" / "depots" / "Depots_geocoded.xlsx"
-        output_folder_path = base_data_dir / "Obi_Buchholz" / base_date_str
+        output_folder_path = base_data_dir / "Obi_Buchholz" / "outputs" / base_date_str
         input_file = base_data_dir / "Obi_Buchholz" / "orders.xlsx"  # Update with your input file
         sheet_name = 'Touren - BEX'
     else:
         depots_path = base_data_dir / "generic_tourplanning" / "depots" / "Depots_geocoded.xlsx"
-        output_folder_path = base_data_dir / "generic_tourplanning" / base_date_str
+        output_folder_path = base_data_dir / "generic_tourplanning" / "outputs" / base_date_str
         input_file = base_data_dir / "generic_tourplanning" / "orders.xlsx"  # Update with your input file
         sheet_name = 'Sheet1'
     
@@ -125,6 +125,9 @@ def main():
     print()
     
     try:
+        # Create output folder if it doesn't exist
+        os.makedirs(output_folder_path, exist_ok=True)
+        
         # Step 1: Upload and load data
         print("Step 1: Loading input file...")
         if not os.path.exists(input_file):

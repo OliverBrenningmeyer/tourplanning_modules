@@ -28,6 +28,8 @@ This system can run both **locally** on your machine and in **Google Colab**.
 
 For the fastest local setup, see [QUICK_RUN.md](QUICK_RUN.md). For detailed instructions, see [LOCAL_SETUP.md](LOCAL_SETUP.md).
 
+**Note**: The `venv/`, `__pycache__/`, and `.vscode/` folders are not needed for execution and are excluded from version control. Create your own virtual environment if needed.
+
 **Quick commands:**
 ```bash
 # Set API key
@@ -56,7 +58,8 @@ python3 run_tour_planning.py
      ├── {client_name}/
      │   ├── depots/
      │   │   └── Depots_geocoded.xlsx
-     │   └── {date}/                    # Output folder (created automatically)
+     │   └── outputs/                   # Output directory (create manually)
+     │       └── {date}/                # Date folders (created automatically)
      ```
 
 2. **HERE API Key**:
@@ -283,7 +286,7 @@ tourplanning_modules/
 ├── setup_local.sh                     # Local setup helper script
 ├── LOCAL_SETUP.md                     # Detailed local setup guide
 ├── QUICK_RUN.md                       # Quick run guide
-├── QUICK_START_SUMMARY.md             # Quick start summary
+├── SETUP.md                           # GitHub repository setup guide
 ├── module_upload.py                   # File upload module
 ├── module_clean.py                    # Data cleaning module
 ├── module_column_mapping.py           # Column mapping module
@@ -297,10 +300,15 @@ tourplanning_modules/
 ├── module_status_tracker.py           # Status tracking module
 ├── module_tour_summary.py             # Tour summary module
 └── data/                              # Local data directory (for local execution)
-    ├── {client_name}/
-    │   ├── depots/
-    │   │   └── Depots_geocoded.xlsx
-    │   └── {date}/                    # Output folder (auto-created)
+    ├── README.md                      # Data structure documentation
+    └── {client_name}/
+        ├── depots/
+        │   └── Depots_geocoded.xlsx    # Required: Depot configuration
+        └── outputs/                   # Output directory (auto-created, not tracked)
+            └── {date}/                # Date-based output folders
+                ├── {date}.csv
+                ├── {date}_import_to_bexOS.csv
+                └── {date}_tours_map.html
 ```
 
 ## Usage
@@ -473,7 +481,7 @@ The paths are structured as:
 - Modules: `/content/drive/MyDrive/Colab Notebooks/tourplanning_modules/`
 - Client data: `/content/drive/MyDrive/Colab Notebooks/{client_name}/`
 - Depots: `/content/drive/MyDrive/Colab Notebooks/{client_name}/depots/`
-- Output: `/content/drive/MyDrive/Colab Notebooks/{client_name}/{date}/`
+- Output: `/content/drive/MyDrive/Colab Notebooks/{client_name}/outputs/{date}/`
 
 ## Data Requirements
 
@@ -502,11 +510,13 @@ Required columns:
 
 ## Output Files
 
-The system generates several output files:
+The system generates several output files in `data/{client}/outputs/{date}/`:
 
 1. **`{date}.csv`**: Complete merged results with all VRP and order data
 2. **`{date}_import_to_bexOS.csv`**: Formatted export for bexOS import
 3. **`{date}_tours_map.html`**: Interactive map visualization
+
+**Note**: Output files are not tracked in version control (see `.gitignore`). Only depot configuration files are tracked.
 
 ## Local Execution Scripts
 
@@ -556,7 +566,8 @@ Both require API keys stored in Google Colab secrets or environment variables.
 
 - **[LOCAL_SETUP.md](LOCAL_SETUP.md)**: Detailed guide for local setup and execution
 - **[QUICK_RUN.md](QUICK_RUN.md)**: Quick reference for running locally
-- **[QUICK_START_SUMMARY.md](QUICK_START_SUMMARY.md)**: Quick start checklist
+- **[SETUP.md](SETUP.md)**: GitHub repository setup guide
+- **[data/README.md](data/README.md)**: Data directory structure and organization
 
 ## License
 
