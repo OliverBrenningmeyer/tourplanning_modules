@@ -118,7 +118,7 @@ product_category = "Ohne Modifikation"
 
 # Set local paths
 depots_path = './data/kemmler/depots/Depots_geocoded.xlsx'
-output_folder_path = f'./data/kemmler/{base_date_str}'
+output_folder_path = f'./data/kemmler/outputs/{base_date_str}'
 input_file = './data/kemmler/orders.xlsx'
 sheet_name = 'Touren - BEX'
 

@@ -51,7 +51,17 @@ Kemmler_Export_File_With_TrackingLinks.ipynb
 .env
 .env.local
 
-# Output files (optional - uncomment if you don't want to track outputs)
-# *.csv
-# *.html
-# *.xlsx
+# Data outputs (generated files - not needed for execution)
+data/*/outputs/
+data/*/*.csv
+data/*/*.html
+data/*/20*/                    # Date-based output folders (YYYY-MM-DD format)
+
+# Input files (user-provided, not in repo)
+data/*/orders.xlsx
+data/*/input*.xlsx
+data/inputs/
+
+# Keep depot files (they are configuration and required for execution)
+!data/*/depots/
+!data/*/depots/*.xlsx

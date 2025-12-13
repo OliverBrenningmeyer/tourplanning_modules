@@ -71,34 +71,35 @@ def main():
     google_drive_base = Path("/Users/oliverroscher/Library/CloudStorage/GoogleDrive-oliver.brenningmeyer@bexapp.de/Meine Ablage/Colab Notebooks")
     
     # Set paths based on client (matching Colab structure)
+    # Note: For Google Drive, you may need to create outputs/ folders manually
     if client_name == "Stark":
         depots_path = google_drive_base / "stark" / "depots" / "Depots_geocoded.xlsx"
-        output_folder_path = google_drive_base / "stark" / base_date_str
+        output_folder_path = google_drive_base / "stark" / "outputs" / base_date_str
         input_file = google_drive_base / "stark" / "orders.xlsx"  # Adjust filename
         sheet_name = 'Sheet1'
     elif client_name == "Kemmler":
         depots_path = google_drive_base / "kemmler" / "depots" / "Depots_geocoded.xlsx"
-        output_folder_path = google_drive_base / "kemmler" / base_date_str
+        output_folder_path = google_drive_base / "kemmler" / "outputs" / base_date_str
         input_file = google_drive_base / "kemmler" / "Kemmler - Auftragsspeicher - Touren.xlsx"
         sheet_name = 'Touren - BEX'
     elif client_name == "laminatDepot_MultiBranch":
         depots_path = google_drive_base / "laminatdepot" / "depots" / "Depots_geocoded.xlsx"
-        output_folder_path = google_drive_base / "laminatdepot" / base_date_str
+        output_folder_path = google_drive_base / "laminatdepot" / "outputs" / base_date_str
         input_file = google_drive_base / "laminatdepot" / "orders.xlsx"  # Adjust filename
         sheet_name = 'input'
     elif client_name == "Wigger":
         depots_path = google_drive_base / "Wigger" / "depots" / "Depots_geocoded.xlsx"
-        output_folder_path = google_drive_base / "Wigger" / base_date_str
+        output_folder_path = google_drive_base / "Wigger" / "outputs" / base_date_str
         input_file = google_drive_base / "Wigger" / "Wigger - Auftragsspeicher - Touren.xlsx"  # Adjust filename
         sheet_name = 'Touren - BEX'
     elif client_name == "Obi_Buchholz":
         depots_path = google_drive_base / "Obi_Buchholz" / "depots" / "Depots_geocoded.xlsx"
-        output_folder_path = google_drive_base / "Obi_Buchholz" / base_date_str
+        output_folder_path = google_drive_base / "Obi_Buchholz" / "outputs" / base_date_str
         input_file = google_drive_base / "Obi_Buchholz" / "orders.xlsx"  # Adjust filename
         sheet_name = 'Touren - BEX'
     else:
         depots_path = google_drive_base / "generic_tourplanning" / "depots" / "Depots_geocoded.xlsx"
-        output_folder_path = google_drive_base / "generic_tourplanning" / base_date_str
+        output_folder_path = google_drive_base / "generic_tourplanning" / "outputs" / base_date_str
         input_file = google_drive_base / "generic_tourplanning" / "orders.xlsx"  # Adjust filename
         sheet_name = 'Sheet1'
     
@@ -123,6 +124,9 @@ def main():
     print()
     
     try:
+        # Create output folder if it doesn't exist
+        os.makedirs(output_folder_path, exist_ok=True)
+        
         # Step 1: Upload and load data
         print("Step 1: Loading input file...")
         if not os.path.exists(input_file):
