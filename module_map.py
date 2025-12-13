@@ -3,6 +3,13 @@ import folium
 from datetime import datetime
 from folium.features import DivIcon
 
+# Try to import Colab display functions
+try:
+    from IPython.display import HTML, display
+    IN_COLAB = True
+except ImportError:
+    IN_COLAB = False
+
 
 def create_map(tours_assigned_df, df_geocoded, unassigned_jobs_data, base_date_str):
     # Initializing the map
@@ -129,5 +136,34 @@ def create_map(tours_assigned_df, df_geocoded, unassigned_jobs_data, base_date_s
     m.get_root().html.add_child(folium.Element(legend_html))
 
     return m
+
+
+def display_map_in_colab(map_obj, width: int = 1000, height: int = 600):
+    """
+    Display a Folium map in Google Colab.
+    
+    Args:
+        map_obj: Folium map object
+        width: Map width in pixels
+        height: Map height in pixels
+    """
+    if IN_COLAB:
+        # Save map to HTML string
+        map_html = map_obj._repr_html_()
+        
+        # Create iframe with proper sizing
+        iframe_html = f"""
+        <div style="width: {width}px; height: {height}px; margin: 0 auto;">
+            {map_html}
+        </div>
+        """
+        
+        display(HTML(iframe_html))
+    else:
+        print("Map created. Use map.save('filename.html') to save it.")
+        print("Or open in Jupyter notebook to display interactively.")
+    
+    return map_obj
+
    
 
