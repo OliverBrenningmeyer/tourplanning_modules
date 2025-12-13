@@ -44,8 +44,8 @@ class InputValidator:
             self.errors.append("   → Check that you selected the correct file and sheet.")
             return False, self.errors, self.warnings
         
-        # Check for minimum required columns
-        required_columns = self._get_required_columns()
+        # Check for minimum required columns (using ORIGINAL column names from mapping)
+        required_columns = self._get_required_columns()  # These are now the original column names
         missing_columns = []
         for col in required_columns:
             if col not in df.columns:
@@ -62,12 +62,14 @@ class InputValidator:
             self.errors.append("   → File format changed (check column names match expected format)")
             self.errors.append("")
             self.errors.append(f"   Expected columns for client '{self.client_name}':")
-            for col in required_columns:
-                mapped_col = self._find_mapped_column(col)
-                if mapped_col:
-                    self.errors.append(f"   - '{mapped_col}' (mapped to '{col}')")
+            # Show original column names and what they map to
+            for original_col in required_columns:
+                # Find what this original column maps to
+                mapped_to = self.column_mapping.get(original_col, original_col)
+                if mapped_to != original_col:
+                    self.errors.append(f"   - '{original_col}' (maps to '{mapped_to}')")
                 else:
-                    self.errors.append(f"   - '{col}'")
+                    self.errors.append(f"   - '{original_col}'")
             return False, self.errors, self.warnings
         
         # Check data quality
@@ -76,9 +78,9 @@ class InputValidator:
         return len(self.errors) == 0, self.errors, self.warnings
     
     def _get_required_columns(self) -> List[str]:
-        """Get the list of required columns for the client."""
-        # Critical columns that must exist after mapping
-        critical_columns = [
+        """Get the list of required columns for the client (ORIGINAL column names, before mapping)."""
+        # Critical columns that must exist AFTER mapping (standardized names)
+        critical_mapped_columns = [
             "customer_branch_cluster",
             "Entl. bis (Auftr.)",
             "Auftr.-Nr.",
@@ -90,12 +92,25 @@ class InputValidator:
         geocoding_config = CONFIG.get(self.client_name, {}).get("geocoding", {"pickup": True, "dropoff": True})
         
         if geocoding_config.get("pickup", True):
-            critical_columns.extend(["Vers.-Str.", "Vers.-PLZ", "Vers.-Ort"])
+            critical_mapped_columns.extend(["Vers.-Str.", "Vers.-PLZ", "Vers.-Ort"])
         
         if geocoding_config.get("dropoff", True):
-            critical_columns.extend(["Empf.-Str.", "Empf.-PLZ", "Empf.-Ort"])
+            critical_mapped_columns.extend(["Empf.-Str.", "Empf.-PLZ", "Empf.-Ort"])
         
-        return critical_columns
+        # Convert mapped column names to original column names (before mapping)
+        # This is what we need to check in the raw input file
+        original_columns = []
+        for mapped_col in critical_mapped_columns:
+            # Find the original column name that maps to this standardized name
+            original_col = self._find_mapped_column(mapped_col)
+            if original_col:
+                # Use the original column name from the mapping
+                original_columns.append(original_col)
+            else:
+                # If no mapping exists, the column name is the same (like "Entl. bis (Auftr.)")
+                original_columns.append(mapped_col)
+        
+        return original_columns
     
     def _find_mapped_column(self, standard_column: str) -> Optional[str]:
         """Find the original column name that maps to the standard column."""
@@ -105,13 +120,24 @@ class InputValidator:
         return None
     
     def _validate_data_quality(self, df: pd.DataFrame):
-        """Validate data quality issues."""
-        # Check for empty critical columns
-        critical_checks = {
+        """Validate data quality issues (using original column names from mapping)."""
+        # Map standardized names to original column names for validation
+        # Check for empty critical columns - use original column names
+        critical_checks_mapped = {
             "customer_branch_cluster": "Branch cluster",
             "Entl. bis (Auftr.)": "Delivery date",
             "Auftr.-Nr.": "Order number"
         }
+        
+        # Convert to original column names
+        critical_checks = {}
+        for mapped_col, description in critical_checks_mapped.items():
+            original_col = self._find_mapped_column(mapped_col)
+            if original_col:
+                critical_checks[original_col] = description
+            else:
+                # If no mapping, use the column name as-is
+                critical_checks[mapped_col] = description
         
         for col, description in critical_checks.items():
             if col in df.columns:
@@ -127,23 +153,25 @@ class InputValidator:
                         self.warnings.append(f"⚠️  {total_issues} rows have missing {description} ('{col}')")
                         self.warnings.append("   → These rows will be filtered out during processing")
         
-        # Check date format
-        if "Entl. bis (Auftr.)" in df.columns:
+        # Check date format - use original column name
+        date_col = "Entl. bis (Auftr.)"  # This one usually doesn't get mapped
+        if date_col in df.columns:
             try:
                 # Try to parse dates
-                pd.to_datetime(df["Entl. bis (Auftr.)"], errors='coerce', format='%d.%m.%y %H:%M')
-                invalid_dates = df["Entl. bis (Auftr.)"].isnull().sum()
+                pd.to_datetime(df[date_col], errors='coerce', format='%d.%m.%y %H:%M')
+                invalid_dates = df[date_col].isnull().sum()
                 if invalid_dates > 0:
-                    self.warnings.append(f"⚠️  {invalid_dates} rows have invalid date format in 'Entl. bis (Auftr.)'")
+                    self.warnings.append(f"⚠️  {invalid_dates} rows have invalid date format in '{date_col}'")
                     self.warnings.append("   → Expected format: 'dd.mm.yy HH:MM' (e.g., '15.12.25 14:30')")
             except:
-                self.warnings.append("⚠️  Could not validate date format in 'Entl. bis (Auftr.)'")
+                self.warnings.append(f"⚠️  Could not validate date format in '{date_col}'")
                 self.warnings.append("   → Expected format: 'dd.mm.yy HH:MM' (e.g., '15.12.25 14:30')")
         
-        # Check numeric columns
-        if "customer_shipment_weight_kg" in df.columns:
+        # Check numeric columns - use original column names
+        weight_col = self._find_mapped_column("customer_shipment_weight_kg") or "customer_shipment_weight_kg"
+        if weight_col in df.columns:
             try:
-                numeric_weight = pd.to_numeric(df["customer_shipment_weight_kg"], errors='coerce')
+                numeric_weight = pd.to_numeric(df[weight_col], errors='coerce')
                 invalid_weight = numeric_weight.isnull().sum()
                 if invalid_weight > 0:
                     self.warnings.append(f"⚠️  {invalid_weight} rows have invalid weight values")
@@ -151,9 +179,10 @@ class InputValidator:
             except:
                 pass
         
-        if "customer_shipment_volume_units" in df.columns:
+        volume_col = self._find_mapped_column("customer_shipment_volume_units") or "customer_shipment_volume_units"
+        if volume_col in df.columns:
             try:
-                numeric_volume = pd.to_numeric(df["customer_shipment_volume_units"], errors='coerce')
+                numeric_volume = pd.to_numeric(df[volume_col], errors='coerce')
                 invalid_volume = numeric_volume.isnull().sum()
                 if invalid_volume > 0:
                     self.warnings.append(f"⚠️  {invalid_volume} rows have invalid volume values")
