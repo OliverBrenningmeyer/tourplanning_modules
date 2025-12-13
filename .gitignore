@@ -1,17 +1,57 @@
-# Python-Cache-Dateien
+# Python
 __pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
 venv/
+env/
+ENV/
+.venv
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb_checkpoints/
+
+# IDE
 .vscode/
-*.pyc
+.idea/
+*.swp
+*.swo
+*~
 
-# Temporäre Dateien
-*.tmp
-*.log
-
-# Jupyter Notebook Checkpoints
-.ipynb_checkpoints/
-TourPlanning_Script.ipynb
-
-# Systemdateien
+# OS
 .DS_Store
 Thumbs.db
+
+# Project specific - exclude client-specific notebooks
+Kemmler_Export_File_With_TrackingLinks.ipynb
+
+# Google Colab
+.drive/
+
+# Environment variables
+.env
+.env.local
+
+# Output files (optional - uncomment if you don't want to track outputs)
+# *.csv
+# *.html
+# *.xlsx
