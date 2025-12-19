@@ -351,6 +351,7 @@ def clean_and_process_data(df: pd.DataFrame, base_date_str: str, output_folder_p
 
     create_new_folder(base_date_str,output_folder_path)
     df['Auftr.-Nr.'] = df['Auftr.-Nr.'].astype(str) # To add a prefix, use this: 'TO' + df['Auftr.-Nr.'].astype(str)
+    df = replace_special_characters_with_underscore(df)  # Replace special characters in 'Auftr.-Nr.' column
 
     df = handle_lieferschein_column(df, client_config)
     df = ensure_column_as_string(df, 'customer_Lieferschein')     # Ensure 'customer_Lieferschein' is treated as a string
