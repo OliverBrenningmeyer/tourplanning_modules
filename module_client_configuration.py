@@ -385,17 +385,10 @@ CONFIG = {
                 {"type": "minimizeTours"}
             ],
             [
-                {"type": "balanceDuration",
-                    "options": {
-                        "threshold": 0.7 #0...1 (higher value is more liked to be enforced in comparison to the other objectives)
-                    }
-                }
+                {"type": "minimizeCost"}
             ],
             [
                 {"type": "maximizeTerritoryJobs"}
-            ],
-            [
-                {"type": "minimizeCost"}
             ]
         ]
     },

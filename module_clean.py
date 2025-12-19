@@ -2,9 +2,10 @@ import pandas as pd
 import os
 from datetime import datetime
 import ast
+import re
+import math
 from module_column_mapping import get_column_mapping, EXPECTED_COLUMNS
 from module_client_configuration import CONFIG
-import math
 
 
 def normalize_column_names(df: pd.DataFrame, column_mapping: dict) -> pd.DataFrame:
@@ -64,6 +65,45 @@ def ensure_column_as_integer(df: pd.DataFrame, column_name: str) -> pd.DataFrame
         pd.DataFrame: DataFrame with the specified column as integer.
     """
     df[column_name] = pd.to_numeric(df[column_name], errors='coerce').fillna(0).apply(lambda x: int(x))
+    return df
+
+def replace_special_characters_with_underscore(df: pd.DataFrame, column_names: list = None, special_chars: str = None) -> pd.DataFrame:
+    """
+    Replace special characters (like commas, semicolons, etc.) with underscores in specified columns.
+    If no columns are specified, the function will apply to 'Auftr.-Nr.' column by default.
+
+    Args:
+        df (pd.DataFrame): The input DataFrame.
+        column_names (list, optional): List of column names to process. If None, processes 'Auftr.-Nr.' column.
+        special_chars (str, optional): String of special characters to replace. 
+                                      If None, defaults to common special characters: ',;:!?@#$%^&*()[]{}|\\/"<>~`'
+
+    Returns:
+        pd.DataFrame: DataFrame with special characters replaced by underscores in the specified columns.
+    """
+    # Default special characters if not provided
+    if special_chars is None:
+        special_chars = ',;:!?@#$%^&*()[]{}|\\/"<>~`'
+    
+    # If no columns specified, default to 'Auftr.-Nr.' column
+    if column_names is None:
+        column_names = ['Auftr.-Nr.']
+    
+    # Ensure column_names is a list
+    if not isinstance(column_names, list):
+        column_names = [column_names]
+    
+    # Process each column
+    for column_name in column_names:
+        if column_name not in df.columns:
+            print(f"⚠️  Warning: Column '{column_name}' does not exist in the DataFrame. Skipping.")
+            continue
+        
+        # Convert to string and replace special characters with underscore
+        df[column_name] = df[column_name].astype(str).apply(
+            lambda x: re.sub(f'[{re.escape(special_chars)}]', '_', x) if isinstance(x, str) else x
+        )
+    
     return df
 
 # Update the function signature to include `client_name`
@@ -311,6 +351,7 @@ def clean_and_process_data(df: pd.DataFrame, base_date_str: str, output_folder_p
 
     create_new_folder(base_date_str,output_folder_path)
     df['Auftr.-Nr.'] = df['Auftr.-Nr.'].astype(str) # To add a prefix, use this: 'TO' + df['Auftr.-Nr.'].astype(str)
+    df = replace_special_characters_with_underscore(df)  # Replace special characters in 'Auftr.-Nr.' column
 
     df = handle_lieferschein_column(df, client_config)
     df = ensure_column_as_string(df, 'customer_Lieferschein')     # Ensure 'customer_Lieferschein' is treated as a string
